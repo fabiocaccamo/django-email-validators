@@ -91,10 +91,10 @@ jobs:
         pre-commit run --all-files --show-diff-on-failure --verbose
 
     - name: Run tests
+      env:
+        PYTHONPATH: src:.
       run: |
-        coverage run --append --source=src/django_validate_email_strict runtests.py
-        coverage report --show-missing
-        coverage xml -o ./coverage.xml
+        pytest --cov=src/django_validate_email_strict --cov-report=term-missing --cov-report=xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
