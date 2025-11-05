@@ -7,6 +7,7 @@ from django.test.utils import get_runner
 
 
 def runtests():
+    """Run tests using Django's test runner."""
     os.environ["DJANGO_SETTINGS_MODULE"] = "tests.settings"
     django.setup()
     TestRunner = get_runner(settings)
