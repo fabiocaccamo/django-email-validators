@@ -17,10 +17,14 @@ from email_validator import (
 # https://github.com/FGRibreau/mailchecker
 from MailChecker import MailChecker
 
+from django_validate_email_strict.providers import COMMON_PROVIDERS
+from django_validate_email_strict.utils import levenshtein_distance
+
 __all__ = [
     "email_is_disposable",
     "validate_email_mx",
     "validate_email_non_disposable",
+    "validate_email_provider_typo",
     "ValidationError",
 ]
 
@@ -70,3 +74,34 @@ def validate_email_mx(value, message=None):
     except EmailNotValidError as error:
         error_message = message or _("Email domain is not deliverable.")
         raise ValidationError(error_message) from error
+
+
+def validate_email_provider_typo(value, message=None):
+    """
+    Validate that email domain isn't likely a typo of a common provider.
+    Checks if domain is 1 character different from known providers AND
+    has no valid MX records (indicating it's likely a typo).
+    Raises ValidationError if domain appears to be a typo.
+    Note: In case of potential typo, this performs a network request to check MX records, so it may be slow.
+    Examples that fail:
+    - user@gmai.com (should be gmail.com)
+    - user@yahooo.com (should be yahoo.com)
+    """
+    validate_email_syntax(value)
+
+    username, domain = value.split("@")
+    domain = domain.lower()
+
+    # check if domain is exactly 1 character different from a known provider
+    for provider in COMMON_PROVIDERS:
+        if levenshtein_distance(domain, provider) == 1:
+            # found a potential typo, verify by checking MX records
+            try:
+                validate_email_deliverability(value, check_deliverability=True)
+                # MX records exist, so it's a valid domain (not a typo)
+                return
+            except EmailNotValidError:
+                # no valid MX records, this is likely a typo
+                suggested_email = f"{username}@{provider}"
+                error_message = message or _(f"Did you mean {suggested_email}?")
+                raise ValidationError(error_message)
