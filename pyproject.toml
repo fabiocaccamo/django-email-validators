@@ -11,19 +11,16 @@ authors = [
 keywords = [
     "python",
     "django",
-    "trees",
-    "tree",
-    "nodes",
-    "node",
-    "categories",
-    "category",
-    "ancestors",
-    "parents",
-    "children",
-    "descendants",
-    "siblings",
-    "abstract",
-    "model",
+    "email",
+    "validation",
+    "validator",
+    "disposable",
+    "deliverable",
+    "mx",
+    "check",
+    "strict",
+    "validator",
+    "verification",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -44,7 +41,9 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "Topic :: Software Development :: Build Tools",
+    "Topic :: Communications :: Email",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dynamic = ["version"]
 maintainers = [
@@ -96,7 +95,16 @@ select = ["B", "B9", "C", "E", "F", "I", "W"]
 max-complexity = 12
 
 [tool.setuptools.packages.find]
+where = ["src"]
 include = ["django_validate_email_strict*"]
 
 [tool.setuptools.dynamic.version]
 attr = "django_validate_email_strict.metadata.__version__"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+python_files = ["test_*.py", "*_test.py", "*_tests.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers --tb=short"
+testpaths = ["tests"]
