@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django_validate_email_strict.validators import (
     validate_email_mx,
     validate_email_non_disposable,
+    validate_email_provider_typo,
 )
 
 
@@ -62,3 +63,78 @@ class TestValidateEmailMX:
         mock_deliverability.side_effect = EmailNotValidError("No MX records")
         with pytest.raises(ValidationError, match="Custom error"):
             validate_email_mx("test@invalid.com", message="Custom error")
+
+
+class TestValidateEmailProviderTypo:
+    """Test the validate_email_provider_typo function."""
+
+    @patch("django_validate_email_strict.validators.validate_email_deliverability")
+    def test_passes_on_valid_provider(self, mock_deliverability):
+        """Test that email with valid provider passes."""
+        mock_deliverability.return_value = {"email": "test@gmail.com"}
+        validate_email_provider_typo("test@gmail.com")  # Should not raise
+        validate_email_provider_typo("test@yahoo.com")  # Should not raise
+        validate_email_provider_typo("test@outlook.com")  # Should not raise
+
+    @patch("django_validate_email_strict.validators.validate_email_deliverability")
+    def test_raises_on_typo_with_no_mx(self, mock_deliverability):
+        """Test that distance-1 typos with no MX records are caught."""
+        from email_validator import EmailNotValidError
+
+        mock_deliverability.side_effect = EmailNotValidError("No MX records")
+        
+        # Missing character
+        with pytest.raises(ValidationError, match="Did you mean"):
+            validate_email_provider_typo("test@gmai.com")
+        
+        # Extra character
+        with pytest.raises(ValidationError, match="Did you mean"):
+            validate_email_provider_typo("test@gmaill.com")
+        
+        # Wrong character
+        with pytest.raises(ValidationError, match="Did you mean"):
+            validate_email_provider_typo("test@gmeil.com")
+
+    @patch("django_validate_email_strict.validators.validate_email_deliverability")
+    def test_passes_on_typo_with_valid_mx(self, mock_deliverability):
+        """Test that similar domains with valid MX records pass (no false positives)."""
+        mock_deliverability.return_value = {"email": "test@aoly.com"}
+        validate_email_provider_typo("test@aoly.com")  # Should not raise (similar to aol.com but valid)
+
+    @patch("django_validate_email_strict.validators.validate_email_deliverability")
+    def test_passes_on_distance_2_typo(self, mock_deliverability):
+        """Test that distance-2+ typos pass to avoid false positives."""
+        mock_deliverability.return_value = {"email": "test@example.com"}
+        validate_email_provider_typo("test@gmai.co")  # Should not raise
+        validate_email_provider_typo("test@gmil.com")  # Should not raise
+
+    @patch("django_validate_email_strict.validators.validate_email_deliverability")
+    def test_suggestion_format(self, mock_deliverability):
+        """Test that suggestion includes corrected email."""
+        from email_validator import EmailNotValidError
+
+        mock_deliverability.side_effect = EmailNotValidError("No MX records")
+        with pytest.raises(ValidationError) as exc_info:
+            validate_email_provider_typo("user@gmai.com")
+        assert "user@gmail.com" in str(exc_info.value)
+
+    @patch("django_validate_email_strict.validators.validate_email_deliverability")
+    def test_case_insensitive(self, mock_deliverability):
+        """Test that provider matching is case-insensitive."""
+        mock_deliverability.return_value = {"email": "test@gmail.com"}
+        validate_email_provider_typo("test@GMAIL.COM")  # Should not raise
+        validate_email_provider_typo("test@Gmail.Com")  # Should not raise
+
+    @patch("django_validate_email_strict.validators.validate_email_deliverability")
+    def test_custom_message(self, mock_deliverability):
+        """Test custom error message."""
+        from email_validator import EmailNotValidError
+
+        mock_deliverability.side_effect = EmailNotValidError("No MX records")
+        with pytest.raises(ValidationError, match="Custom error"):
+            validate_email_provider_typo("test@gmai.com", message="Custom error")
+
+    def test_invalid_email_syntax(self):
+        """Test that invalid email syntax raises ValidationError."""
+        with pytest.raises(ValidationError):
+            validate_email_provider_typo("invalid-email")

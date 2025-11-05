@@ -12,8 +12,10 @@ class TestPackageImports:
             email_is_disposable,
             validate_email_mx,
             validate_email_non_disposable,
+            validate_email_provider_typo,
         )
 
         assert email_is_disposable is not None
         assert validate_email_mx is not None
         assert validate_email_non_disposable is not None
+        assert validate_email_provider_typo is not None
