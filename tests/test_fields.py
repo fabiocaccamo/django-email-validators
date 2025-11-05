@@ -35,14 +35,14 @@ class TestModelFieldIntegration:
         """Test that non-disposable validator raises ValidationError on full_clean."""
         from django.db import models
 
-        class TestModel(models.Model):
+        class TestModelNonDisposable(models.Model):
             email = models.EmailField(validators=[validate_email_non_disposable])
 
             class Meta:
                 app_label = "test"
 
         mock_is_disposable.return_value = True
-        instance = TestModel(email="test@disposable.com")
+        instance = TestModelNonDisposable(email="test@disposable.com")
 
         with pytest.raises(ValidationError) as exc_info:
             instance.full_clean()
@@ -55,14 +55,14 @@ class TestModelFieldIntegration:
         from django.db import models
         from email_validator import EmailNotValidError
 
-        class TestModel(models.Model):
+        class TestModelMX(models.Model):
             email = models.EmailField(validators=[validate_email_mx])
 
             class Meta:
                 app_label = "test"
 
         mock_deliverability.side_effect = EmailNotValidError("No MX records")
-        instance = TestModel(email="test@invalid.com")
+        instance = TestModelMX(email="test@invalid.com")
 
         with pytest.raises(ValidationError) as exc_info:
             instance.full_clean()
