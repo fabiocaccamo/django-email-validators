@@ -82,7 +82,8 @@ def validate_email_provider_typo(value, message=None):
     Checks if domain is 1 character different from known providers AND
     has no valid MX records (indicating it's likely a typo).
     Raises ValidationError if domain appears to be a typo.
-    Note: In case of potential typo, this performs a network request to check MX records, so it may be slow.
+    Note: In case of potential typo, this performs
+    a network request to check MX records, so it may be slow.
     Examples that fail:
     - user@gmai.com (should be gmail.com)
     - user@yahooo.com (should be yahoo.com)
@@ -100,8 +101,8 @@ def validate_email_provider_typo(value, message=None):
                 validate_email_deliverability(value, check_deliverability=True)
                 # MX records exist, so it's a valid domain (not a typo)
                 return
-            except EmailNotValidError:
+            except EmailNotValidError as error:
                 # no valid MX records, this is likely a typo
                 suggested_email = f"{username}@{provider}"
                 error_message = message or _(f"Did you mean {suggested_email}?")
-                raise ValidationError(error_message)
+                raise ValidationError(error_message) from error
