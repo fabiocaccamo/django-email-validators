@@ -1,2 +1,3 @@
 # django-validate-email-strict
-No more invalid or disposable emails in your database.
+
+✉️ ✅ no more invalid or disposable emails in your database.

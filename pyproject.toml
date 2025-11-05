@@ -1,0 +1,102 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-validate-email-strict"
+description = "no more invalid or disposable emails in your database."
+authors = [
+    { name = "Fabio Caccamo", email = "fabio.caccamo@gmail.com" },
+]
+keywords = [
+    "python",
+    "django",
+    "trees",
+    "tree",
+    "nodes",
+    "node",
+    "categories",
+    "category",
+    "ancestors",
+    "parents",
+    "children",
+    "descendants",
+    "siblings",
+    "abstract",
+    "model",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 4.0",
+    "Framework :: Django :: 4.1",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Framework :: Django :: 5.2",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Build Tools",
+]
+dynamic = ["version"]
+maintainers = [
+    { name = "Fabio Caccamo", email = "fabio.caccamo@gmail.com" },
+]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.license]
+file = "LICENSE.txt"
+content-type = "text/plain"
+
+[project.urls]
+Homepage = "https://github.com/fabiocaccamo/django-validate-email-strict"
+Download = "https://github.com/fabiocaccamo/django-validate-email-strict/releases"
+Documentation = "https://github.com/fabiocaccamo/django-validate-email-strict#readme"
+Issues = "https://github.com/fabiocaccamo/django-validate-email-strict/issues"
+Funding = "https://github.com/sponsors/fabiocaccamo/"
+Twitter = "https://twitter.com/fabiocaccamo"
+
+[tool.black]
+line-length = 88
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | venv
+)/
+'''
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+ignore = []
+select = ["B", "B9", "C", "E", "F", "I", "W"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 12
+
+[tool.setuptools.packages.find]
+include = ["django_validate_email_strict*"]
+
+[tool.setuptools.dynamic.version]
+attr = "django_validate_email_strict.metadata.__version__"
