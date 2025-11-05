@@ -18,15 +18,18 @@ from email_validator import (
 from MailChecker import MailChecker
 
 __all__ = [
-    "DeliverableEmailValidator",
     "email_is_disposable",
-    "NonDisposableEmailValidator",
-    "validate_email_strict",
+    "validate_email_mx",
+    "validate_email_non_disposable",
     "ValidationError",
 ]
 
 
 def email_is_disposable(email):
+    """
+    Check if email is from a disposable email provider.
+    Returns True if disposable, False otherwise.
+    """
     domain = email.partition("@")[2].lower()
 
     # check using https://github.com/disposable-email-domains/disposable-email-domains
@@ -41,44 +44,38 @@ def email_is_disposable(email):
     return False
 
 
-class NonDisposableEmailValidator:
+def validate_email_non_disposable(value, message=None):
     """
-    Raises ValidationError if email is from a known disposable provider.
+    Validate email syntax and check if it's from a disposable provider.
+    Raises ValidationError if validation fails.
+    
+    Args:
+        value: Email address to validate
+        message: Optional custom error message
     """
-
-    def __init__(self, message=None):
-        self.message = message or _("Disposable emails are not allowed.")
-
-    def __call__(self, value):
-        if email_is_disposable(value):
-            raise ValidationError(self.message)
-
-
-class DeliverableEmailValidator:
-    """
-    Raises ValidationError if email domain is not deliverable (MX check).
-    """
-
-    def __init__(self, message=None):
-        self.message = message or _("Email domain is not deliverable.")
-
-    def __call__(self, value):
-        try:
-            # check using https://pypi.org/project/email-validator/
-            validate_email_deliverability(value, check_deliverability=True)
-        except EmailNotValidError as error:
-            raise ValidationError(self.message) from error
-
-
-def validate_email_strict(value, check_disposable=True, check_deliverability=True):
-    """
-    Run Django syntax validation, then optional disposable and MX checks.
-    """
-
     validate_email_syntax(value)
+    
+    if email_is_disposable(value):
+        error_message = message or _("Disposable emails are not allowed.")
+        raise ValidationError(error_message)
 
-    if check_disposable:
-        NonDisposableEmailValidator()(value)
 
-    if check_deliverability:
-        DeliverableEmailValidator()(value)
+def validate_email_mx(value, message=None):
+    """
+    Validate email syntax and check if the domain has valid MX records.
+    Raises ValidationError if validation fails.
+    
+    Note: This performs a network request and may be slow.
+    
+    Args:
+        value: Email address to validate
+        message: Optional custom error message
+    """
+    validate_email_syntax(value)
+    
+    try:
+        # check using https://pypi.org/project/email-validator/
+        validate_email_deliverability(value, check_deliverability=True)
+    except EmailNotValidError as error:
+        error_message = message or _("Email domain is not deliverable.")
+        raise ValidationError(error_message) from error
