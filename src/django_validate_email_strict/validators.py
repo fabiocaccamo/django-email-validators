@@ -1,38 +1,31 @@
+# https://github.com/disposable/disposable-email-domains/
+
+# https://github.com/disposable-email-domains/disposable-email-domains
+from disposable_email_domains import blocklist
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email as validate_email_syntax
 from django.utils.translation import gettext_lazy as _
 
-# https://github.com/disposable/disposable-email-domains/
-from disposable import domains
-
-# https://github.com/disposable-email-domains/disposable-email-domains
-from disposable_email_domains import blocklist
-
 # https://pypi.org/project/email-validator/
 from email_validator import (
-    validate_email as validate_email_deliverability,
     EmailNotValidError,
+    validate_email as validate_email_deliverability,
 )
 
 # https://github.com/FGRibreau/mailchecker
-from mailchecker import MailChecker
+from MailChecker import MailChecker
 
 __all__ = [
     "DeliverableEmailValidator",
     "email_is_disposable",
     "NonDisposableEmailValidator",
-    "validate_email",
+    "validate_email_strict",
     "ValidationError",
 ]
 
 
 def email_is_disposable(email):
     domain = email.partition("@")[2].lower()
-    domains = []
-
-    # check using https://github.com/disposable/disposable-email-domains/
-    if domain in domains:
-        return True
 
     # check using https://github.com/disposable-email-domains/disposable-email-domains
     if domain in blocklist:
@@ -75,7 +68,7 @@ class DeliverableEmailValidator:
             raise ValidationError(self.message)
 
 
-def validate_email(value, check_disposable=True, check_deliverability=True):
+def validate_email_strict(value, check_disposable=True, check_deliverability=True):
     """
     Run Django syntax validation, then optional disposable and MX checks.
     """
