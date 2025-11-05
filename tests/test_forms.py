@@ -1,41 +1,24 @@
 """
 Tests for using validators with Django forms.
 """
-import pytest
-from django.core.exceptions import ValidationError
-
 from django_validate_email_strict.validators import (
     validate_email_mx,
     validate_email_non_disposable,
 )
 
 
-class TestValidateEmailNonDisposableWithForms:
-    """Test validate_email_non_disposable with Django form fields."""
+class TestFormFieldIntegration:
+    """Test that validators can be used with Django form fields."""
 
-    def test_as_form_field_validator(self):
-        """Test validate_email_non_disposable works as form EmailField validator."""
+    def test_validators_can_be_assigned_to_form_fields(self):
+        """Test that validators can be assigned to form EmailField."""
         from django import forms
 
         class TestForm(forms.Form):
-            email = forms.EmailField(validators=[validate_email_non_disposable])
+            email1 = forms.EmailField(validators=[validate_email_non_disposable])
+            email2 = forms.EmailField(validators=[validate_email_mx])
 
-        # Valid email should pass (syntax only, would need mock for full test)
-        form = TestForm(data={"email": "test@example.com"})
-        # Just test instantiation
-        assert form.data["email"] == "test@example.com"
-
-
-class TestValidateEmailMXWithForms:
-    """Test validate_email_mx with Django form fields."""
-
-    def test_as_form_field_validator(self):
-        """Test validate_email_mx works as form EmailField validator."""
-        from django import forms
-
-        class TestForm(forms.Form):
-            email = forms.EmailField(validators=[validate_email_mx])
-
-        # Valid email should pass
-        form = TestForm(data={"email": "test@example.com"})
-        assert form.data["email"] == "test@example.com"
+        # Just verify the form can be created with our validators
+        form = TestForm()
+        assert form.fields["email1"].validators
+        assert form.fields["email2"].validators

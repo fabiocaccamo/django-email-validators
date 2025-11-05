@@ -1,6 +1,8 @@
 """
 Tests for using validators with Django model fields.
 """
+from unittest.mock import patch
+
 import pytest
 from django.core.exceptions import ValidationError
 
@@ -10,38 +12,59 @@ from django_validate_email_strict.validators import (
 )
 
 
-class TestValidateEmailNonDisposableWithFields:
-    """Test validate_email_non_disposable as a model field validator."""
+class TestModelFieldIntegration:
+    """Test that validators can be used with Django model fields."""
 
-    def test_as_model_field_validator(self):
-        """Test validate_email_non_disposable works as EmailField validator."""
+    def test_validators_can_be_assigned_to_model_fields(self):
+        """Test that validators can be assigned to EmailField."""
         from django.db import models
 
-        class TestModelNonDisposable(models.Model):
+        class TestModel(models.Model):
+            email1 = models.EmailField(validators=[validate_email_non_disposable])
+            email2 = models.EmailField(validators=[validate_email_mx])
+
+            class Meta:
+                app_label = "test"
+
+        # Just verify the model can be created with our validators
+        assert TestModel._meta.get_field("email1").validators
+        assert TestModel._meta.get_field("email2").validators
+
+    @patch("django_validate_email_strict.validators.email_is_disposable")
+    def test_non_disposable_validator_raises_on_save(self, mock_is_disposable):
+        """Test that non-disposable validator raises ValidationError on full_clean."""
+        from django.db import models
+
+        class TestModel(models.Model):
             email = models.EmailField(validators=[validate_email_non_disposable])
 
             class Meta:
                 app_label = "test"
 
-        # Valid email should pass (with syntax check only, mocked)
-        instance = TestModelNonDisposable(email="test@example.com")
-        # Note: Full validation would require mocking, so we just test instantiation
-        assert instance.email == "test@example.com"
+        mock_is_disposable.return_value = True
+        instance = TestModel(email="test@disposable.com")
 
+        with pytest.raises(ValidationError) as exc_info:
+            instance.full_clean()
 
-class TestValidateEmailMXWithFields:
-    """Test validate_email_mx as a model field validator."""
+        assert "email" in exc_info.value.error_dict
 
-    def test_as_model_field_validator(self):
-        """Test validate_email_mx works as EmailField validator."""
+    @patch("django_validate_email_strict.validators.validate_email_deliverability")
+    def test_mx_validator_raises_on_save(self, mock_deliverability):
+        """Test that MX validator raises ValidationError on full_clean."""
         from django.db import models
+        from email_validator import EmailNotValidError
 
-        class TestModelMX(models.Model):
+        class TestModel(models.Model):
             email = models.EmailField(validators=[validate_email_mx])
 
             class Meta:
                 app_label = "test"
 
-        # Valid email should pass
-        instance = TestModelMX(email="test@example.com")
-        assert instance.email == "test@example.com"
+        mock_deliverability.side_effect = EmailNotValidError("No MX records")
+        instance = TestModel(email="test@invalid.com")
+
+        with pytest.raises(ValidationError) as exc_info:
+            instance.full_clean()
+
+        assert "email" in exc_info.value.error_dict
