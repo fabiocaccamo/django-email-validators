@@ -1,6 +1,3 @@
-# https://github.com/disposable/disposable-email-domains/
-
-# https://github.com/disposable-email-domains/disposable-email-domains
 from disposable_email_domains import blocklist
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email as validate_email_syntax
@@ -32,6 +29,7 @@ __all__ = [
 def email_is_disposable(email):
     """
     Check if email is from a disposable email provider.
+
     Returns True if disposable, False otherwise.
     """
     domain = email.partition("@")[2].lower()
@@ -51,6 +49,7 @@ def email_is_disposable(email):
 def validate_email_non_disposable(value, message=None):
     """
     Validate email syntax and check if it's from a disposable provider.
+
     Raises ValidationError if validation fails.
     """
     validate_email_syntax(value)
@@ -63,7 +62,9 @@ def validate_email_non_disposable(value, message=None):
 def validate_email_mx(value, message=None):
     """
     Validate email syntax and check if the domain has valid MX records.
+
     Raises ValidationError if validation fails.
+
     Note: This performs a network request and may be slow.
     """
     validate_email_syntax(value)
@@ -81,9 +82,12 @@ def validate_email_provider_typo(value, message=None):
     Validate that email domain isn't likely a typo of a common provider.
     Checks if domain is 1 character different from known providers AND
     has no valid MX records (indicating it's likely a typo).
+
     Raises ValidationError if domain appears to be a typo.
+
     Note: In case of potential typo, this performs
     a network request to check MX records, so it may be slow.
+
     Examples that fail:
     - user@gmai.com (should be gmail.com)
     - user@yahooo.com (should be yahoo.com)
