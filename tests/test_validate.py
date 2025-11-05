@@ -1,6 +1,7 @@
 """
 Tests for the main validate_email_* functions.
 """
+
 from unittest.mock import patch
 
 import pytest
@@ -82,15 +83,15 @@ class TestValidateEmailProviderTypo:
         from email_validator import EmailNotValidError
 
         mock_deliverability.side_effect = EmailNotValidError("No MX records")
-        
+
         # Missing character
         with pytest.raises(ValidationError, match="Did you mean"):
             validate_email_provider_typo("test@gmai.com")
-        
+
         # Extra character
         with pytest.raises(ValidationError, match="Did you mean"):
             validate_email_provider_typo("test@gmaill.com")
-        
+
         # Wrong character
         with pytest.raises(ValidationError, match="Did you mean"):
             validate_email_provider_typo("test@gmeil.com")
@@ -99,7 +100,9 @@ class TestValidateEmailProviderTypo:
     def test_passes_on_typo_with_valid_mx(self, mock_deliverability):
         """Test that similar domains with valid MX records pass (no false positives)."""
         mock_deliverability.return_value = {"email": "test@aoly.com"}
-        validate_email_provider_typo("test@aoly.com")  # Should not raise (similar to aol.com but valid)
+        validate_email_provider_typo(
+            "test@aoly.com"
+        )  # Should not raise (similar to aol.com but valid)
 
     @patch("django_validate_email_strict.validators.validate_email_deliverability")
     def test_passes_on_distance_2_typo(self, mock_deliverability):

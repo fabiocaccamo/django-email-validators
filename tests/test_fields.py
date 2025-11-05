@@ -1,6 +1,7 @@
 """
 Tests for using validators with Django model fields.
 """
+
 from unittest.mock import patch
 
 import pytest

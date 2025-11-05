@@ -1,9 +1,8 @@
 """
 Tests for package metadata.
 """
-import re
 
-import pytest
+import re
 
 
 class TestMetadata:

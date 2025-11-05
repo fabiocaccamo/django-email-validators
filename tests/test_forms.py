@@ -1,6 +1,7 @@
 """
 Tests for using validators with Django forms.
 """
+
 from django_validate_email_strict.validators import (
     validate_email_mx,
     validate_email_non_disposable,

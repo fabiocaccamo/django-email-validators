@@ -1,6 +1,7 @@
 """
 Tests for email validation helper functions.
 """
+
 from unittest.mock import patch
 
 from django_validate_email_strict.validators import email_is_disposable
