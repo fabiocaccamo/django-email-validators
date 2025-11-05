@@ -9,6 +9,8 @@ from django.utils.translation import gettext_lazy as _
 # https://pypi.org/project/email-validator/
 from email_validator import (
     EmailNotValidError,
+)
+from email_validator import (
     validate_email as validate_email_deliverability,
 )
 
@@ -64,8 +66,8 @@ class DeliverableEmailValidator:
         try:
             # check using https://pypi.org/project/email-validator/
             validate_email_deliverability(value, check_deliverability=True)
-        except EmailNotValidError:
-            raise ValidationError(self.message)
+        except EmailNotValidError as error:
+            raise ValidationError(self.message) from error
 
 
 def validate_email_strict(value, check_disposable=True, check_deliverability=True):
