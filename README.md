@@ -81,9 +81,7 @@ pre-commit install --install-hooks
 # run tests
 tox
 # or
-python runtests.py
-# or
-python -m django test --settings "tests.settings"
+pytest
 ```
 
 ## License
