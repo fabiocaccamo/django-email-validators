@@ -1,11 +1,11 @@
-# django-validate-email-strict
+# django-email-validators
 # Copyright (C) 2025-present Fabio Caccamo
-# This file is distributed under the same license as the django-validate-email-strict package.
+# This file is distributed under the same license as the django-email-validators package.
 # Fabio Caccamo <fabio.caccamo@gmail.com>, 2025.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: django-validate-email-strict\n"
+"Project-Id-Version: django-email-validators\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-05 16:08-0600\n"
 "PO-Revision-Date: 2025-11-05 16:08-0600\n"
