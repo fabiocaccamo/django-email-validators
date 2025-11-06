@@ -1,0 +1,26 @@
+# django-email-validators
+# Copyright (C) 2025-present Fabio Caccamo
+# This file is distributed under the same license as the django-email-validators package.
+# Fabio Caccamo <fabio.caccamo@gmail.com>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django-email-validators\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-05 16:08-0600\n"
+"PO-Revision-Date: 2025-11-05 16:08-0600\n"
+"Last-Translator: Fabio Caccamo <fabio.caccamo@gmail.com>\n"
+"Language-Team: Italian\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/django_email_validators/validators.py
+msgid "Disposable emails are not allowed."
+msgstr "Le email temporanee non sono consentite."
+
+#: src/django_email_validators/validators.py
+msgid "Email domain is not deliverable."
+msgstr "Il dominio email non è raggiungibile."

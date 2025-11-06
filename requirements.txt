@@ -1,0 +1,5 @@
+django >= 4.0
+disposable-email-domains == 0.0.*
+email-validator == 2.3.*
+mailchecker == 6.0.*
+pyIsEmail == 2.0.*
