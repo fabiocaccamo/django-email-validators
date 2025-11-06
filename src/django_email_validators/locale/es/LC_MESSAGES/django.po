@@ -7,20 +7,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-validate-email-strict\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-05 16:04-0600\n"
-"PO-Revision-Date: 2025-11-05 16:04-0600\n"
+"POT-Creation-Date: 2025-11-05 16:08-0600\n"
+"PO-Revision-Date: 2025-11-05 16:08-0600\n"
 "Last-Translator: Fabio Caccamo <fabio.caccamo@gmail.com>\n"
-"Language-Team: English\n"
-"Language: en\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/django_validate_email_strict/validators.py
+#: src/django_email_validators/validators.py
 msgid "Disposable emails are not allowed."
-msgstr "Disposable emails are not allowed."
+msgstr "No se permiten correos electrónicos desechables."
 
-#: src/django_validate_email_strict/validators.py
+#: src/django_email_validators/validators.py
 msgid "Email domain is not deliverable."
-msgstr "Email domain is not deliverable."
+msgstr "El dominio del correo electrónico no es accesible."

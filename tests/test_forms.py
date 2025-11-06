@@ -2,7 +2,7 @@
 Tests for using validators with Django forms.
 """
 
-from django_validate_email_strict.validators import (
+from django_email_validators.validators import (
     validate_email_mx,
     validate_email_non_disposable,
 )

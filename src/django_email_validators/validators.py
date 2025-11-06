@@ -14,8 +14,8 @@ from email_validator import (
 # https://github.com/FGRibreau/mailchecker
 from MailChecker import MailChecker
 
-from django_validate_email_strict.providers import COMMON_PROVIDERS
-from django_validate_email_strict.utils import levenshtein_distance
+from django_email_validators.providers import COMMON_PROVIDERS
+from django_email_validators.utils import levenshtein_distance
 
 __all__ = [
     "email_is_disposable",

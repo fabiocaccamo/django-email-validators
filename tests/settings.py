@@ -1,7 +1,7 @@
-SECRET_KEY = "django-validate-email-strict"
+SECRET_KEY = "django-email-validators"
 
 INSTALLED_APPS = [
-    "django_validate_email_strict",
+    "django_email_validators",
 ]
 
 USE_TZ = True

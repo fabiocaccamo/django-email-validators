@@ -1,4 +1,4 @@
-from django_validate_email_strict.validators import (
+from django_email_validators.validators import (
     ValidationError,
     email_is_disposable,
     validate_email_mx,

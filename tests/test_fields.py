@@ -7,7 +7,7 @@ from unittest.mock import patch
 import pytest
 from django.core.exceptions import ValidationError
 
-from django_validate_email_strict.validators import (
+from django_email_validators.validators import (
     validate_email_mx,
     validate_email_non_disposable,
 )
@@ -31,7 +31,7 @@ class TestModelFieldIntegration:
         assert TestModel._meta.get_field("email1").validators
         assert TestModel._meta.get_field("email2").validators
 
-    @patch("django_validate_email_strict.validators.email_is_disposable")
+    @patch("django_email_validators.validators.email_is_disposable")
     def test_non_disposable_validator_raises_on_save(self, mock_is_disposable):
         """Test that non-disposable validator raises ValidationError on full_clean."""
         from django.db import models
@@ -50,7 +50,7 @@ class TestModelFieldIntegration:
 
         assert "email" in exc_info.value.error_dict
 
-    @patch("django_validate_email_strict.validators.validate_email_deliverability")
+    @patch("django_email_validators.validators.validate_email_deliverability")
     def test_mx_validator_raises_on_save(self, mock_deliverability):
         """Test that MX validator raises ValidationError on full_clean."""
         from django.db import models

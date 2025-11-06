@@ -8,7 +8,7 @@ class TestPackageImports:
 
     def test_package_imports(self):
         """Test that all public functions and classes can be imported."""
-        from django_validate_email_strict import (
+        from django_email_validators import (
             email_is_disposable,
             validate_email_mx,
             validate_email_non_disposable,

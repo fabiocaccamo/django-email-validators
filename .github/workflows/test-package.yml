@@ -94,7 +94,7 @@ jobs:
       env:
         PYTHONPATH: src:.
       run: |
-        pytest --cov=src/django_validate_email_strict --cov-report=term-missing --cov-report=xml
+        pytest --cov=src/django_email_validators --cov-report=term-missing --cov-report=xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5

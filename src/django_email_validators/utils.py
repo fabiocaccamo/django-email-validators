@@ -1,8 +1,3 @@
-"""
-Utility functions for email validation.
-"""
-
-
 def levenshtein_distance(s1, s2):
     """
     Calculate Levenshtein distance between two strings.
@@ -18,7 +13,6 @@ def levenshtein_distance(s1, s2):
     for i, c1 in enumerate(s1):
         current_row = [i + 1]
         for j, c2 in enumerate(s2):
-            # Cost of insertions, deletions, or substitutions
             insertions = previous_row[j + 1] + 1
             deletions = current_row[j] + 1
             substitutions = previous_row[j] + (c1 != c2)

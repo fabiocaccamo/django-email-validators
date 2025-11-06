@@ -10,7 +10,7 @@ class TestMetadata:
 
     def test_metadata(self):
         """Test that all metadata fields exist and are strings."""
-        from django_validate_email_strict.metadata import (
+        from django_email_validators.metadata import (
             __author__,
             __copyright__,
             __description__,
@@ -30,7 +30,7 @@ class TestMetadata:
 
     def test_version(self):
         """Test that version follows semantic versioning format."""
-        from django_validate_email_strict.metadata import __version__
+        from django_email_validators.metadata import __version__
 
         v = __version__
         v_re = re.compile(r"^([0-9]+)(\.([0-9]+)){1,2}$")
