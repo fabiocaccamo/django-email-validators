@@ -23,26 +23,9 @@ no more invalid or disposable emails in your database.
 ## Usage
 
 ### Validators
-- [`validate_email_non_disposable`](#validate_email_non_disposable)
-- [`validate_email_mx`](#validate_email_mx)
-- [`validate_email_provider_typo`](#validate_email_provider_typo)
-
-```python
-from django.db import models
-from django_email_validators import (
-    validate_email_non_disposable,
-    validate_email_mx,
-    validate_email_provider_typo,
-)
-
-class User(models.Model):
-    email = models.EmailField(
-        validators=[
-            validate_email_non_disposable,
-            validate_email_provider_typo,
-        ]
-    )
-```
+- 🗑️ `validate_email_non_disposable`
+- 🌐 `validate_email_mx`
+- ✍️ `validate_email_provider_typo`
 
 #### `validate_email_non_disposable`
 Validates that the email is not from a disposable email provider *(fast, offline check)*.
@@ -59,6 +42,24 @@ Checks a one-character diff against 80+ common providers and verifies the domain
 - `user@gmail.co` -> suggests `user@gmail.com`
 - `user@yahooo.com` -> suggests `user@yahoo.com`
 
+#### Usage
+```python
+from django.db import models
+from django_email_validators import (
+    validate_email_non_disposable,
+    validate_email_mx,
+    validate_email_provider_typo,
+)
+
+class User(models.Model):
+    email = models.EmailField(
+        validators=[
+            validate_email_non_disposable,
+            validate_email_mx,
+            validate_email_provider_typo,
+        ]
+    )
+```
 
 ## Testing
 ```bash
