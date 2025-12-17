@@ -52,7 +52,6 @@ maintainers = [
     { name = "Fabio Caccamo", email = "fabio.caccamo@gmail.com" },
 ]
 dependencies = [
-    "django >= 4.0, < 6.0.0",
     "disposable-email-domains >= 0.0.147, < 1.0.0",
     "email-validator >= 2.3.0, < 3.0.0",
     "mailchecker >= 6.0.19, < 7.0.0",
