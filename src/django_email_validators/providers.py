@@ -1,6 +1,7 @@
 """
 Common email providers list for typo detection.
 """
+
 from django.conf import settings
 
 # Common email providers to check for typos
