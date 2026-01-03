@@ -108,5 +108,7 @@ def validate_email_provider_typo(value, message=None):
             except EmailNotValidError as error:
                 # no valid MX records, this is likely a typo
                 suggested_email = f"{username}@{provider}"
-                error_message = message or _(f"Did you mean {suggested_email}?")
+                error_message = message or _("Did you mean %(email)s?") % {
+                    "email": suggested_email
+                }
                 raise ValidationError(error_message) from error
