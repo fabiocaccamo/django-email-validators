@@ -1,6 +1,7 @@
 """
 Common email providers list for typo detection.
 """
+from django.conf import settings
 
 # Common email providers to check for typos
 COMMON_PROVIDERS = [
@@ -88,3 +89,7 @@ COMMON_PROVIDERS = [
     "zoho.com",
     "zoho.eu",
 ]
+
+if hasattr(settings, "EMAIL_VALIDATORS_EXTEND_COMMON_PROVIDERS"):
+    COMMON_PROVIDERS.extend(settings.EMAIL_VALIDATORS_EXTEND_COMMON_PROVIDERS)
+    COMMON_PROVIDERS = list(set(COMMON_PROVIDERS))
