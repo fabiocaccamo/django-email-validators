@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-email-validators\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-05 16:08-0600\n"
+"POT-Creation-Date: 2026-01-03 21:55+0100\n"
 "PO-Revision-Date: 2025-11-05 16:08-0600\n"
 "Last-Translator: Fabio Caccamo <fabio.caccamo@gmail.com>\n"
 "Language-Team: Spanish\n"
@@ -17,10 +17,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/django_email_validators/validators.py
+#: django_email_validators/validators.py
 msgid "Disposable emails are not allowed."
 msgstr "No se permiten correos electrónicos desechables."
 
-#: src/django_email_validators/validators.py
+#: django_email_validators/validators.py
 msgid "Email domain is not deliverable."
 msgstr "El dominio del correo electrónico no es accesible."
+
+#: django_email_validators/validators.py
+#, python-format
+msgid "Did you mean %(email)s?"
+msgstr "¿Quisiste decir %(email)s?"
