@@ -61,6 +61,14 @@ class User(models.Model):
     )
 ```
 
+### Extending the providers list for typo check
+You can extend the list of common email providers used by `validate_email_provider_typo` by adding your own list in Django settings:
+```python
+EMAIL_VALIDATORS_EXTEND_COMMON_PROVIDERS = [
+    'hey.com',
+]
+```
+
 ## Testing
 ```bash
 # clone repository
