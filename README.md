@@ -26,6 +26,7 @@ no more invalid or disposable emails in your database.
 - 🗑️ `validate_email_non_disposable`
 - 🌐 `validate_email_mx`
 - ✍️ `validate_email_provider_typo`
+- 👤 `validate_email_unique_dot_insensitive`
 
 #### `validate_email_non_disposable`
 Validates that the email is not from a disposable email provider *(fast, offline check)*.
@@ -42,7 +43,43 @@ Checks a one-character diff against 80+ common providers and verifies the domain
 - `user@gmail.co` -> suggests `user@gmail.com`
 - `user@yahooo.com` -> suggests `user@yahoo.com`
 
+#### `validate_email_unique_dot_insensitive`
+Validates that the email is unique in the database, accounting for dot-insensitive providers (e.g. Gmail treats dots in the local part as insignificant, so `fabio.caccamo@gmail.com` and `fabiocaccamo@gmail.com` are the same inbox).
+
+Accepts an optional `exclude_pk` argument to exclude the current user when updating an existing account, and an optional `field` argument (default: `"email"`) to specify the model field name.
+
+**Examples that will be caught:**
+- `fabio.caccamo@gmail.com` already exists → `fabiocaccamo@gmail.com` is rejected
+
+Since this validator requires access to the model instance (to exclude it on update), it cannot be used directly in a field's `validators=[...]`. Call it explicitly in a form or serializer:
+
+```python
+from django_email_validators import validate_email_unique_dot_insensitive
+
+# Form example
+class UserForm(forms.ModelForm):
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        exclude_pk = self.instance.pk
+        validate_email_unique_dot_insensitive(email, exclude_pk=exclude_pk)
+        return email
+```
+
+Or via `validate_unique` on the model:
+
+```python
+class User(models.Model):
+    email = models.EmailField()
+
+    def validate_unique(self, exclude=None):
+        super().validate_unique(exclude=exclude)
+        validate_email_unique_dot_insensitive(self.email, exclude_pk=self.pk)
+```
+
 #### Usage
+
+> **Note:** `validate_email_unique_dot_insensitive` requires access to the model instance and cannot be used in `validators=[...]`. See the [dedicated section above](#validate_email_unique_dot_insensitive) for usage examples.
+
 ```python
 from django.db import models
 from django_email_validators import (
@@ -66,6 +103,14 @@ You can extend the list of common email providers used by `validate_email_provid
 ```python
 EMAIL_VALIDATORS_EXTEND_COMMON_PROVIDERS = [
     'hey.com',
+]
+```
+
+### Extending the dot-insensitive domains list
+You can extend the list of dot-insensitive domains used by `validate_email_unique_dot_insensitive` by adding your own list in Django settings:
+```python
+EMAIL_VALIDATORS_EXTEND_DOT_INSENSITIVE_DOMAINS = [
+    'fastmail.com',
 ]
 ```
 

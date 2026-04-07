@@ -5,7 +5,7 @@ Common email providers list for typo detection.
 from django.conf import settings
 
 # Common email providers to check for typos
-COMMON_PROVIDERS = [
+COMMON_PROVIDERS = {
     "126.com",
     "163.com",
     "aliyun.com",
@@ -89,8 +89,17 @@ COMMON_PROVIDERS = [
     "yandex.ru",
     "zoho.com",
     "zoho.eu",
-]
+}
+
+DOT_INSENSITIVE_DOMAINS = {
+    "gmail.com",
+    "googlemail.com",
+}
 
 if hasattr(settings, "EMAIL_VALIDATORS_EXTEND_COMMON_PROVIDERS"):
-    COMMON_PROVIDERS.extend(settings.EMAIL_VALIDATORS_EXTEND_COMMON_PROVIDERS)
-    COMMON_PROVIDERS = list(set(COMMON_PROVIDERS))
+    COMMON_PROVIDERS.update(settings.EMAIL_VALIDATORS_EXTEND_COMMON_PROVIDERS)
+
+if hasattr(settings, "EMAIL_VALIDATORS_EXTEND_DOT_INSENSITIVE_DOMAINS"):
+    DOT_INSENSITIVE_DOMAINS.update(
+        settings.EMAIL_VALIDATORS_EXTEND_DOT_INSENSITIVE_DOMAINS
+    )
