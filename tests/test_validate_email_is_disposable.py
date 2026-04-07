@@ -1,5 +1,5 @@
 """
-Tests for email validation helper functions.
+Tests for the email_is_disposable function.
 """
 
 from unittest.mock import patch
