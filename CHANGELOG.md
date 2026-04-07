@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0](https://github.com/fabiocaccamo/django-email-validators/releases/tag/0.3.0) - 2026-04-07
+-   Add `validate_email_unique_dot_insensitive` validator.
+-   Refactor validators tests.
+-   Bump requirements and `pre-commit` hooks.
+
 ## [0.2.1](https://github.com/fabiocaccamo/django-email-validators/releases/tag/0.2.1) - 2026-01-03
 -   Add possibility to extend common providers. (by [DmytroLitvinov](https://github.com/DmytroLitvinov) in #12)
 -   Fix `makemessages` message extraction.
