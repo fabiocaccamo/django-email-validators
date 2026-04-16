@@ -11,6 +11,7 @@
 [![](https://img.shields.io/codecov/c/gh/fabiocaccamo/django-email-validators?logo=codecov)](https://codecov.io/gh/fabiocaccamo/django-email-validators)
 [![](https://img.shields.io/badge/code%20style-black-000000.svg?logo=python&logoColor=black)](https://github.com/psf/black)
 [![](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/fabiocaccamo/django-email-validators/badge)](https://securityscorecards.dev/viewer/?uri=github.com/fabiocaccamo/django-email-validators)
 
 # django-email-validators
 no more invalid or disposable emails in your database.
