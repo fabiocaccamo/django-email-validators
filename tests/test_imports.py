@@ -13,9 +13,15 @@ class TestPackageImports:
             validate_email_mx,
             validate_email_non_disposable,
             validate_email_provider_typo,
+            validate_email_unique,
+            validate_email_unique_dot_insensitive,
+            validate_email_unique_subaddress_insensitive,
         )
 
         assert email_is_disposable is not None
         assert validate_email_mx is not None
         assert validate_email_non_disposable is not None
         assert validate_email_provider_typo is not None
+        assert validate_email_unique is not None
+        assert validate_email_unique_dot_insensitive is not None
+        assert validate_email_unique_subaddress_insensitive is not None

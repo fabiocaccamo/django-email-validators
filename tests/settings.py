@@ -15,4 +15,8 @@ DATABASES = {
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+EMAIL_VALIDATORS_EXTEND_DOT_INSENSITIVE_DOMAINS = [
+    "dotless.test",
+]
+
 USE_TZ = True
