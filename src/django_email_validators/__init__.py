@@ -3,7 +3,9 @@ from django_email_validators.validators import (
     validate_email_mx,
     validate_email_non_disposable,
     validate_email_provider_typo,
+    validate_email_unique,
     validate_email_unique_dot_insensitive,
+    validate_email_unique_subaddress_insensitive,
 )
 
 __all__ = [
@@ -11,5 +13,7 @@ __all__ = [
     "validate_email_mx",
     "validate_email_non_disposable",
     "validate_email_provider_typo",
+    "validate_email_unique",
     "validate_email_unique_dot_insensitive",
+    "validate_email_unique_subaddress_insensitive",
 ]

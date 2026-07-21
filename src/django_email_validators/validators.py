@@ -25,7 +25,9 @@ __all__ = [
     "validate_email_mx",
     "validate_email_non_disposable",
     "validate_email_provider_typo",
+    "validate_email_unique",
     "validate_email_unique_dot_insensitive",
+    "validate_email_unique_subaddress_insensitive",
 ]
 
 
@@ -119,36 +121,42 @@ def validate_email_provider_typo(value, message=None):
                 raise ValidationError(error_message) from error
 
 
-def validate_email_unique_dot_insensitive(
-    value, exclude_pk=None, field="email", message=None
+def _validate_email_unique(
+    value,
+    exclude_pk=None,
+    field="email",
+    message=None,
+    dot_insensitive=False,
+    subaddress_insensitive=False,
 ):
     """
-    Validate email uniqueness accounting for dot-insensitive email providers
-    (e.g. Gmail treats dots in the local part as insignificant, so
-    fabio.caccamo@gmail.com and fabiocaccamo@gmail.com are the same inbox).
+    Core email uniqueness check against the user model.
+
+    Builds a regex pattern from the local part (optionally ignoring the
+    "+tag" subaddress and/or dots on dot-insensitive providers) and checks
+    for duplicates in the database.
 
     Raises ValidationError if a duplicate is found.
-
-    Usage:
-        # signup
-        validate_email_unique_dot_insensitive("fabio.caccamo@gmail.com")
-
-        # update (exclude current user)
-        validate_email_unique_dot_insensitive(
-            "fabio.caccamo@gmail.com", exclude_pk=instance.pk
-        )
     """
     email = normalize_email(value)
     validate_email_syntax(email)
 
     local, domain = split_email(email)
 
-    if domain not in DOT_INSENSITIVE_DOMAINS:
-        return
+    subaddress_regex = ""
+    if subaddress_insensitive:
+        local_base = local.split("+", 1)[0]
+        if local_base:
+            local = local_base
+        subaddress_regex = r"(\+[^@]*)?"
 
-    local_stripped = local.replace(".", "")
-    local_regex = r"\.?".join(re.escape(char) for char in local_stripped)
-    pattern = rf"^{local_regex}@{re.escape(domain)}$"
+    if dot_insensitive and domain in DOT_INSENSITIVE_DOMAINS:
+        local_stripped = local.replace(".", "")
+        local_regex = r"\.?".join(re.escape(char) for char in local_stripped)
+    else:
+        local_regex = re.escape(local)
+
+    pattern = rf"^{local_regex}{subaddress_regex}@{re.escape(domain)}$"
 
     User = get_user_model()
     qs = User.objects.all()
@@ -160,10 +168,100 @@ def validate_email_unique_dot_insensitive(
         duplicate_exists = qs.filter(**{f"{field}__iregex": pattern}).exists()
     except FieldError as exc:
         raise ValueError(
-            f"validate_email_unique_dot_insensitive: "
-            f"field '{field}' not found on {User.__name__}."
+            f"validate_email_unique: field '{field}' not found on {User.__name__}."
         ) from exc
 
     if duplicate_exists:
         error_message = message or _("A user with this email address already exists.")
         raise ValidationError(error_message)
+
+
+def validate_email_unique_dot_insensitive(
+    value, exclude_pk=None, field="email", message=None
+):
+    """
+    Validate email uniqueness accounting for dot-insensitive email providers
+    (e.g. Gmail treats dots in the local part as insignificant, so
+    "us.er@gmail.com" and "user@gmail.com" are the same inbox).
+
+    Raises ValidationError if a duplicate is found.
+    """
+    _validate_email_unique(
+        value,
+        exclude_pk=exclude_pk,
+        field=field,
+        message=message,
+        dot_insensitive=True,
+        subaddress_insensitive=False,
+    )
+
+
+def validate_email_unique_subaddress_insensitive(
+    value, exclude_pk=None, field="email", message=None
+):
+    """
+    Validate email uniqueness ignoring the "+tag" subaddress (RFC 5233),
+    on any domain ("user+tag@example.com" matches "user@example.com").
+
+    Raises ValidationError if a duplicate is found.
+    """
+    _validate_email_unique(
+        value,
+        exclude_pk=exclude_pk,
+        field=field,
+        message=message,
+        dot_insensitive=False,
+        subaddress_insensitive=True,
+    )
+
+
+def validate_email_unique(
+    value,
+    exclude_pk=None,
+    field="email",
+    message=None,
+    dot_insensitive=True,
+    subaddress_insensitive=True,
+):
+    """
+    Validate email uniqueness against the user model.
+
+    Options:
+    - dot_insensitive: on dot-insensitive providers (e.g. Gmail) dots in the
+      local part are ignored when comparing ("us.er@gmail.com" matches
+      "user@gmail.com").
+    - subaddress_insensitive: the "+tag" subaddress (RFC 5233) is ignored
+      when comparing, on any domain ("user+tag@example.com" matches
+      "user@example.com").
+
+    With both options disabled it performs a plain case-insensitive
+    uniqueness check.
+
+    Raises ValidationError if a duplicate is found.
+
+    Usage:
+        # signup
+        validate_email_unique("user@example.com")
+
+        # update (exclude current user)
+        validate_email_unique("user@example.com", exclude_pk=instance.pk)
+    """
+    if dot_insensitive and not subaddress_insensitive:
+        validate_email_unique_dot_insensitive(
+            value, exclude_pk=exclude_pk, field=field, message=message
+        )
+    elif subaddress_insensitive and not dot_insensitive:
+        validate_email_unique_subaddress_insensitive(
+            value, exclude_pk=exclude_pk, field=field, message=message
+        )
+    else:
+        # both options enabled (combined check requires a single pattern:
+        # subaddress stripped first, then dots) or both disabled (plain check)
+        _validate_email_unique(
+            value,
+            exclude_pk=exclude_pk,
+            field=field,
+            message=message,
+            dot_insensitive=dot_insensitive,
+            subaddress_insensitive=subaddress_insensitive,
+        )
