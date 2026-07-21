@@ -70,8 +70,14 @@ from django_email_validators import validate_email_unique
 class UserForm(forms.ModelForm):
     def clean_email(self):
         email = self.cleaned_data["email"]
-        exclude_pk = self.instance.pk
-        validate_email_unique(email, exclude_pk=exclude_pk)
+        validate_email_unique(
+            email,
+            exclude_pk=self.instance.pk,  # exclude the current user on update
+            field="email",  # model field name (default: "email")
+            message=None,  # custom error message (default: localized message)
+            dot_insensitive=True,  # ignore dots on dot-insensitive providers
+            subaddress_insensitive=True,  # ignore the "+tag" subaddress
+        )
         return email
 ```
 
@@ -83,10 +89,38 @@ class User(models.Model):
 
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude=exclude)
-        validate_email_unique(self.email, exclude_pk=self.pk)
+        validate_email_unique(
+            self.email,
+            exclude_pk=self.pk,  # exclude the current instance on update
+            field="email",  # model field name (default: "email")
+            message=None,  # custom error message (default: localized message)
+            dot_insensitive=True,  # ignore dots on dot-insensitive providers
+            subaddress_insensitive=True,  # ignore the "+tag" subaddress
+        )
 ```
 
-> **Shortcuts:** `validate_email_unique_dot_insensitive` and `validate_email_unique_subaddress_insensitive` are available as single-option shortcuts: the first is equivalent to `validate_email_unique(..., subaddress_insensitive=False)` (only dots on dot-insensitive providers), the second to `validate_email_unique(..., dot_insensitive=False)` (only the `+tag` subaddress).
+#### `validate_email_unique_dot_insensitive`
+Validates that the email is unique in the database, accounting only for dot-insensitive providers (e.g. Gmail treats dots in the local part as insignificant), while the `+tag` subaddress is significant.
+
+Equivalent to `validate_email_unique(dot_insensitive=True, subaddress_insensitive=False)`, it accepts the same `exclude_pk`, `field` and `message` arguments.
+
+**Examples that will be caught:**
+- `user@gmail.com` already exists → `us.er@gmail.com` is rejected
+
+**Examples that will pass:**
+- `user@example.com` already exists → `us.er@example.com` passes (non dot-insensitive domain)
+- `user@gmail.com` already exists → `user+tag@gmail.com` passes (subaddress is significant)
+
+#### `validate_email_unique_subaddress_insensitive`
+Validates that the email is unique in the database, ignoring only the `+tag` subaddress ([RFC 5233](https://datatracker.ietf.org/doc/html/rfc5233)), on any domain, while dots in the local part are always significant.
+
+Equivalent to `validate_email_unique(dot_insensitive=False, subaddress_insensitive=True)`, it accepts the same `exclude_pk`, `field` and `message` arguments.
+
+**Examples that will be caught:**
+- `user@example.com` already exists → `user+tag@example.com` is rejected (and vice versa)
+
+**Examples that will pass:**
+- `user@gmail.com` already exists → `us.er@gmail.com` passes (dots are significant)
 
 #### Usage
 
