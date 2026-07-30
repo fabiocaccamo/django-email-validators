@@ -1,8 +1,5 @@
-import re
-
 from disposable_email_domains import blocklist
-from django.contrib.auth import get_user_model
-from django.core.exceptions import FieldError, ValidationError
+from django.core.exceptions import ValidationError
 from django.core.validators import validate_email as validate_email_syntax
 from django.utils.translation import gettext_lazy as _
 
@@ -13,7 +10,8 @@ from email_validator import validate_email as validate_email_deliverability
 # https://github.com/FGRibreau/mailchecker
 from MailChecker import MailChecker
 
-from django_email_validators.providers import COMMON_PROVIDERS, DOT_INSENSITIVE_DOMAINS
+from django_email_validators.providers import COMMON_PROVIDERS
+from django_email_validators.users import get_user_queryset_by_email
 from django_email_validators.utils import (
     levenshtein_distance,
     normalize_email,
@@ -132,44 +130,18 @@ def _validate_email_unique(
     """
     Core email uniqueness check against the user model.
 
-    Builds a regex pattern from the local part (optionally ignoring the
-    "+tag" subaddress and/or dots on dot-insensitive providers) and checks
-    for duplicates in the database.
+    Delegates the lookup to get_user_queryset_by_email (same matching
+    rules by construction) and raises if any duplicate is found.
 
     Raises ValidationError if a duplicate is found.
     """
-    email = normalize_email(value)
-    validate_email_syntax(email)
-
-    local, domain = split_email(email)
-
-    subaddress_regex = ""
-    if subaddress_insensitive:
-        local_base = local.split("+", 1)[0]
-        if local_base:
-            local = local_base
-        subaddress_regex = r"(\+[^@]*)?"
-
-    if dot_insensitive and domain in DOT_INSENSITIVE_DOMAINS:
-        local_stripped = local.replace(".", "")
-        local_regex = r"\.?".join(re.escape(char) for char in local_stripped)
-    else:
-        local_regex = re.escape(local)
-
-    pattern = rf"^{local_regex}{subaddress_regex}@{re.escape(domain)}$"
-
-    User = get_user_model()
-    qs = User.objects.all()
-
-    if exclude_pk is not None:
-        qs = qs.exclude(pk=exclude_pk)
-
-    try:
-        duplicate_exists = qs.filter(**{f"{field}__iregex": pattern}).exists()
-    except FieldError as exc:
-        raise ValueError(
-            f"validate_email_unique: field '{field}' not found on {User.__name__}."
-        ) from exc
+    duplicate_exists = get_user_queryset_by_email(
+        value,
+        field=field,
+        exclude_pk=exclude_pk,
+        dot_insensitive=dot_insensitive,
+        subaddress_insensitive=subaddress_insensitive,
+    ).exists()
 
     if duplicate_exists:
         error_message = message or _("A user with this email address already exists.")
