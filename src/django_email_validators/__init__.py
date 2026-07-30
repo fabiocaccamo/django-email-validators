@@ -1,3 +1,7 @@
+from django_email_validators.users import (
+    get_user_object_by_email,
+    get_user_queryset_by_email,
+)
 from django_email_validators.validators import (
     email_is_disposable,
     validate_email_mx,
@@ -10,6 +14,8 @@ from django_email_validators.validators import (
 
 __all__ = [
     "email_is_disposable",
+    "get_user_object_by_email",
+    "get_user_queryset_by_email",
     "validate_email_mx",
     "validate_email_non_disposable",
     "validate_email_provider_typo",
