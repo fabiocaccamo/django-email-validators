@@ -144,6 +144,44 @@ class User(models.Model):
     )
 ```
 
+### Lookup
+- 🔍 `get_user_queryset_by_email`
+- 🔍 `get_user_object_by_email`
+
+Retrieve the user account(s) matching an email address, using the **same matching rules** as `validate_email_unique` (case-insensitive, `dot_insensitive` and `subaddress_insensitive`, both `True` by default). Unlike the validators, these functions never raise `ValidationError` for a match: they return the matching records.
+
+Both accept the same arguments: `field` (default: `"email"`), `exclude_pk`, `dot_insensitive`, `subaddress_insensitive` and an optional base `queryset` (default: all users).
+
+#### `get_user_queryset_by_email`
+Returns the **queryset** of matching users (0..N records). Raises `ValueError` if the field does not exist on the user model.
+
+#### `get_user_object_by_email`
+Returns the **first matching user or `None`**. Unlike `Manager.get`, it never raises for missing matches.
+
+```python
+from django_email_validators import get_user_object_by_email
+
+user = get_user_object_by_email("us.er+tag@gmail.com")
+# -> the user registered as "user@gmail.com", or None if not found
+```
+
+This is useful for **enumeration-safe signup/recovery flows**: retrieve the existing account matching the submitted email (including dot/subaddress variants) without revealing its existence in the response:
+
+```python
+from django_email_validators import get_user_object_by_email
+
+def signup(request):
+    email = request.POST["email"]
+    user = get_user_object_by_email(email)
+    if user:
+        # account already exists: notify the account owner by email
+        send_account_exists_email(user)
+    else:
+        create_account_and_send_confirmation(email)
+    # same response in both cases: no account enumeration
+    return render(request, "signup_check_your_email.html")
+```
+
 ### Extending the providers list for typo check
 You can extend the list of common email providers used by `validate_email_provider_typo` by adding your own list in Django settings:
 ```python
