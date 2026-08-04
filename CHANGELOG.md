@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0](https://github.com/fabiocaccamo/django-email-validators/releases/tag/0.6.0) - 2026-08-04
+-   Add generic `get_queryset_by_email` and `get_object_by_email` lookup helpers (work with any model / queryset).
+-   Refactor `get_user_queryset_by_email` and `get_user_object_by_email` as thin wrappers around the generic helpers.
+
 ## [0.5.0](https://github.com/fabiocaccamo/django-email-validators/releases/tag/0.5.0) - 2026-07-30
 -   Add `get_user_queryset_by_email` and `get_user_object_by_email` lookup helpers (same matching rules as `validate_email_unique`).
 -   Refactor `validate_email_unique` to delegate the lookup to `get_user_queryset_by_email`.

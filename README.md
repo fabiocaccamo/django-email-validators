@@ -147,16 +147,27 @@ class User(models.Model):
 ### Lookup
 - 🔍 `get_user_queryset_by_email`
 - 🔍 `get_user_object_by_email`
+- 🔍 `get_queryset_by_email`
+- 🔍 `get_object_by_email`
 
 Retrieve the user account(s) matching an email address, using the **same matching rules** as `validate_email_unique` (case-insensitive, `dot_insensitive` and `subaddress_insensitive`, both `True` by default). Unlike the validators, these functions never raise `ValidationError` for a match: they return the matching records.
 
-Both accept the same arguments: `field` (default: `"email"`), `exclude_pk`, `dot_insensitive`, `subaddress_insensitive` and an optional base `queryset` (default: all users).
+All accept the same options: `field` (default: `"email"`), `exclude_pk`, `dot_insensitive` and `subaddress_insensitive`.
 
 #### `get_user_queryset_by_email`
-Returns the **queryset** of matching users (0..N records). Raises `ValueError` if the field does not exist on the user model.
+Returns the **queryset** of matching users (0..N records). Accepts an optional base `queryset` (default: all users). Raises `ValueError` if the field does not exist on the user model.
 
 #### `get_user_object_by_email`
 Returns the **first matching user or `None`**. Unlike `Manager.get`, it never raises for missing matches.
+
+#### `get_queryset_by_email` / `get_object_by_email`
+Generic versions that work with **any model**: the base `queryset` is required as second argument.
+
+```python
+from django_email_validators import get_queryset_by_email
+
+subscribers = get_queryset_by_email("us.er+tag@gmail.com", Subscriber.objects.all())
+```
 
 ```python
 from django_email_validators import get_user_object_by_email
