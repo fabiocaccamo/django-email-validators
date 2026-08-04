@@ -1,3 +1,4 @@
+from django_email_validators.mx import get_mx_hosts
 from django_email_validators.objects import (
     get_object_by_email,
     get_queryset_by_email,
@@ -18,6 +19,7 @@ from django_email_validators.validators import (
 
 __all__ = [
     "email_is_disposable",
+    "get_mx_hosts",
     "get_object_by_email",
     "get_queryset_by_email",
     "get_user_object_by_email",

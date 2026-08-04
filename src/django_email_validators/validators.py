@@ -3,13 +3,10 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email as validate_email_syntax
 from django.utils.translation import gettext_lazy as _
 
-# https://pypi.org/project/email-validator/
-from email_validator import EmailNotValidError
-from email_validator import validate_email as validate_email_deliverability
-
 # https://github.com/FGRibreau/mailchecker
 from MailChecker import MailChecker
 
+from django_email_validators.mx import get_domain_suffixes, get_mx_hosts
 from django_email_validators.providers import COMMON_PROVIDERS
 from django_email_validators.users import get_user_queryset_by_email
 from django_email_validators.utils import (
@@ -29,11 +26,19 @@ __all__ = [
 ]
 
 
-def email_is_disposable(email):
+def email_is_disposable(email, check_mx=False):
     """
     Check if email is from a disposable email provider.
 
+    If check_mx is True, also resolve the domain MX records and check
+    the MX hostnames (and their domain suffixes) against the blocklists:
+    disposable providers rotate their facade domains faster than
+    blocklists, but the MX records keep pointing to the provider's
+    (blocklisted) mail server.
+
     Returns True if disposable, False otherwise.
+
+    Note: with check_mx=True this performs a network request and may be slow.
     """
     email = normalize_email(email)
     _, domain = split_email(email)
@@ -46,20 +51,35 @@ def email_is_disposable(email):
     if not MailChecker.is_valid(email):
         return True
 
+    if check_mx:
+        # check the MX hostnames against the blocklists, e.g.
+        # "fresh-domain.net" -> MX "prd-smtp.10minutemail.com"
+        # -> "10minutemail.com" (blocklisted)
+        # (a failed lookup returns None: fail open, no match)
+        for host in get_mx_hosts(domain) or []:
+            for candidate in get_domain_suffixes(host):
+                if candidate in blocklist or candidate in MailChecker.blacklist:
+                    return True
+
     # good, email is not disposable
     return False
 
 
-def validate_email_non_disposable(value, message=None):
+def validate_email_non_disposable(value, message=None, check_mx=False):
     """
     Validate email syntax and check if it's from a disposable provider.
 
+    If check_mx is True, also check the domain MX records against the
+    disposable providers blocklists (catches fresh facade domains).
+
     Raises ValidationError if validation fails.
+
+    Note: with check_mx=True this performs a network request and may be slow.
     """
     email = normalize_email(value)
     validate_email_syntax(email)
 
-    if email_is_disposable(email):
+    if email_is_disposable(email, check_mx=check_mx):
         error_message = message or _("Disposable emails are not allowed.")
         raise ValidationError(error_message)
 
@@ -74,13 +94,17 @@ def validate_email_mx(value, message=None):
     """
     email = normalize_email(value)
     validate_email_syntax(email)
+    domain = split_email(email)[1]
 
-    try:
-        # check using https://pypi.org/project/email-validator/
-        validate_email_deliverability(email, check_deliverability=True)
-    except EmailNotValidError as error:
+    mx_hosts = get_mx_hosts(domain)
+    if mx_hosts is None:
+        # the lookup could not be performed (e.g. DNS timeout):
+        # fail open, don't reject valid emails on infrastructure errors
+        return
+
+    if not mx_hosts:
         error_message = message or _("Email domain is not deliverable.")
-        raise ValidationError(error_message) from error
+        raise ValidationError(error_message)
 
 
 def validate_email_provider_typo(value, message=None):
@@ -106,17 +130,17 @@ def validate_email_provider_typo(value, message=None):
     for provider in COMMON_PROVIDERS:
         if levenshtein_distance(domain, provider) == 1:
             # found a potential typo, verify by checking MX records
-            try:
-                validate_email_deliverability(email, check_deliverability=True)
-                # MX records exist, so it's a valid domain (not a typo)
+            mx_hosts = get_mx_hosts(domain)
+            if mx_hosts or mx_hosts is None:
+                # MX records exist (valid domain, not a typo) or the
+                # lookup could not be performed (fail open)
                 return
-            except EmailNotValidError as error:
-                # no valid MX records, this is likely a typo
-                suggested_email = f"{local}@{provider}"
-                error_message = message or _("Did you mean %(email)s?") % {
-                    "email": suggested_email
-                }
-                raise ValidationError(error_message) from error
+            # no valid MX records, this is likely a typo
+            suggested_email = f"{local}@{provider}"
+            error_message = message or _("Did you mean %(email)s?") % {
+                "email": suggested_email
+            }
+            raise ValidationError(error_message)
 
 
 def _validate_email_unique(

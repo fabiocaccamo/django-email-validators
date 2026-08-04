@@ -10,6 +10,7 @@ class TestPackageImports:
         """Test that all public functions and classes can be imported."""
         from django_email_validators import (
             email_is_disposable,
+            get_mx_hosts,
             get_object_by_email,
             get_queryset_by_email,
             get_user_object_by_email,
@@ -23,6 +24,7 @@ class TestPackageImports:
         )
 
         assert email_is_disposable is not None
+        assert get_mx_hosts is not None
         assert get_object_by_email is not None
         assert get_queryset_by_email is not None
         assert get_user_object_by_email is not None

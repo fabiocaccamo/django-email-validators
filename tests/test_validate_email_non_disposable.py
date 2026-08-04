@@ -33,6 +33,23 @@ class TestValidateEmailNonDisposable:
         with pytest.raises(ValidationError, match="Custom error"):
             validate_email_non_disposable("test@disposable.com", message="Custom error")
 
+    @patch("django_email_validators.validators.email_is_disposable")
+    def test_check_mx_disabled_by_default(self, mock_is_disposable):
+        """Test that check_mx defaults to False."""
+        mock_is_disposable.return_value = False
+        validate_email_non_disposable("test@example.com")
+        mock_is_disposable.assert_called_once_with("test@example.com", check_mx=False)
+
+    @patch("django_email_validators.validators.email_is_disposable")
+    def test_check_mx_propagation(self, mock_is_disposable):
+        """Test that check_mx is propagated to email_is_disposable."""
+        mock_is_disposable.return_value = True
+        with pytest.raises(ValidationError):
+            validate_email_non_disposable("test@fresh-domain.net", check_mx=True)
+        mock_is_disposable.assert_called_once_with(
+            "test@fresh-domain.net", check_mx=True
+        )
+
     def test_invalid_email_syntax(self):
         """Test that invalid email syntax raises ValidationError."""
         with pytest.raises(ValidationError):

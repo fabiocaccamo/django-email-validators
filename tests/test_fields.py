@@ -50,11 +50,10 @@ class TestModelFieldIntegration:
 
         assert "email" in exc_info.value.error_dict
 
-    @patch("django_email_validators.validators.validate_email_deliverability")
-    def test_mx_validator_raises_on_save(self, mock_deliverability):
+    @patch("django_email_validators.validators.get_mx_hosts")
+    def test_mx_validator_raises_on_save(self, mock_get_mx_hosts):
         """Test that MX validator raises ValidationError on full_clean."""
         from django.db import models
-        from email_validator import EmailNotValidError
 
         class TestModelMX(models.Model):
             email = models.EmailField(validators=[validate_email_mx])
@@ -62,7 +61,7 @@ class TestModelFieldIntegration:
             class Meta:
                 app_label = "test"
 
-        mock_deliverability.side_effect = EmailNotValidError("No MX records")
+        mock_get_mx_hosts.return_value = []
         instance = TestModelMX(email="test@invalid.com")
 
         with pytest.raises(ValidationError) as exc_info:
