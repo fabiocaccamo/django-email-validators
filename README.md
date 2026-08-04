@@ -34,6 +34,8 @@ no more invalid or disposable emails in your database.
 #### `validate_email_non_disposable`
 Validates that the email is not from a disposable email provider *(fast, offline check)*.
 
+Accepts an optional `check_mx` argument (default: `False`): when enabled, the domain MX hostnames (and their domain suffixes) are also checked against the disposable providers blocklists. Disposable services rotate their facade domains faster than blocklists, but the MX records keep pointing to the provider's (blocklisted) mail server, so this catches fresh domains not yet blocklisted (e.g. `kjkpc.net` -> MX `prd-smtp.10minutemail.com` -> `10minutemail.com`). *Note: with `check_mx=True` a network request is performed, so it may be slow (MX lookups are cached in-process per domain).*
+
 #### `validate_email_mx`
 Validates that the email domain has valid MX records *(slow, requires network access)*.
 
