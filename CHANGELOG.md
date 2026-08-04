@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0](https://github.com/fabiocaccamo/django-email-validators/releases/tag/0.7.0) - 2026-08-04
+-   Add opt-in `check_mx` argument to `email_is_disposable` and `validate_email_non_disposable`: also check the domain MX hostnames (and their domain suffixes) against the disposable providers blocklists, catching fresh facade domains not yet blocklisted (e.g. `kjkpc.net` -> MX `prd-smtp.10minutemail.com` -> `10minutemail.com`).
+-   Add `get_mx_hosts` helper with in-process per-domain cache, so multiple validators checking the same domain cost a single DNS lookup.
+-   Refactor `validate_email_mx` and `validate_email_provider_typo` to use the shared (cached) `get_mx_hosts` helper. MX-based checks now fail open on DNS infrastructure errors (e.g. timeouts): valid emails are no longer at risk of rejection when the resolver is unavailable. Domains without MX records but with A/AAAA records (implicit MX, RFC 5321) are now considered not deliverable.
+-   Replace the `email-validator` dependency with a direct `dnspython` dependency.
+-   Bump test requirements, `pre-commit` hooks and GitHub Actions.
+
 ## [0.6.0](https://github.com/fabiocaccamo/django-email-validators/releases/tag/0.6.0) - 2026-08-04
 -   Add generic `get_queryset_by_email` and `get_object_by_email` lookup helpers (work with any model / queryset).
 -   Refactor `get_user_queryset_by_email` and `get_user_object_by_email` as thin wrappers around the generic helpers.
