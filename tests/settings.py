@@ -4,6 +4,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.auth",
     "django_email_validators",
+    "tests",
 ]
 
 DATABASES = {
