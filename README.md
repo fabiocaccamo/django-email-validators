@@ -68,6 +68,7 @@ Since this validator requires access to the model instance (to exclude it on upd
 ```python
 from django_email_validators import validate_email_unique
 
+
 # Form example
 class UserForm(forms.ModelForm):
     def clean_email(self):
@@ -136,6 +137,7 @@ from django_email_validators import (
     validate_email_provider_typo,
 )
 
+
 class User(models.Model):
     email = models.EmailField(
         validators=[
@@ -183,6 +185,7 @@ This is useful for **enumeration-safe signup/recovery flows**: retrieve the exis
 ```python
 from django_email_validators import get_user_object_by_email
 
+
 def signup(request):
     email = request.POST["email"]
     user = get_user_object_by_email(email)
@@ -199,7 +202,7 @@ def signup(request):
 You can extend the list of common email providers used by `validate_email_provider_typo` by adding your own list in Django settings:
 ```python
 EMAIL_VALIDATORS_EXTEND_COMMON_PROVIDERS = [
-    'hey.com',
+    "hey.com",
 ]
 ```
 
@@ -207,7 +210,7 @@ EMAIL_VALIDATORS_EXTEND_COMMON_PROVIDERS = [
 You can extend the list of dot-insensitive domains used by `validate_email_unique` by adding your own list in Django settings:
 ```python
 EMAIL_VALIDATORS_EXTEND_DOT_INSENSITIVE_DOMAINS = [
-    'fastmail.com',
+    "fastmail.com",
 ]
 ```
 
