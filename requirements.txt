@@ -1,4 +1,4 @@
-django >= 4.2
+django >= 6.1
 disposable-email-domains == 0.0.*
 dnspython == 2.8.*
 mailchecker == 6.0.*
