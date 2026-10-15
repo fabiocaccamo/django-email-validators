@@ -13,7 +13,11 @@ from django.core.exceptions import FieldError
 from django.core.validators import validate_email as validate_email_syntax
 
 from django_email_validators.providers import DOT_INSENSITIVE_DOMAINS
-from django_email_validators.utils import normalize_email, split_email
+from django_email_validators.utils import (
+    canonicalize_email,
+    normalize_email,
+    split_email,
+)
 
 __all__ = [
     "get_object_by_email",
@@ -29,18 +33,14 @@ def _build_email_match_pattern(email, dot_insensitive, subaddress_insensitive):
     The pattern is anchored and meant to be used with a case-insensitive
     match (the "iregex" queryset lookup).
     """
-    local, domain = split_email(email)
+    local, domain = split_email(
+        canonicalize_email(email, dot_insensitive, subaddress_insensitive)
+    )
 
-    subaddress_regex = ""
-    if subaddress_insensitive:
-        local_base = local.split("+", 1)[0]
-        if local_base:
-            local = local_base
-        subaddress_regex = r"(\+[^@]*)?"
+    subaddress_regex = r"(\+[^@]*)?" if subaddress_insensitive else ""
 
     if dot_insensitive and domain in DOT_INSENSITIVE_DOMAINS:
-        local_stripped = local.replace(".", "")
-        local_regex = r"\.?".join(re.escape(char) for char in local_stripped)
+        local_regex = r"\.?".join(re.escape(char) for char in local)
     else:
         local_regex = re.escape(local)
 

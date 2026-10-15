@@ -195,6 +195,20 @@ def signup(request):
     return render(request, "signup_check_your_email.html")
 ```
 
+### Canonical form
+- `canonicalize_email`
+
+Returns the **canonical form** of an email address, using the **same matching rules** as `validate_email_unique` (`dot_insensitive` and `subaddress_insensitive`, both `True` by default): every address that maps to the same inbox gets the same string.
+
+```python
+from django_email_validators import canonicalize_email
+
+canonicalize_email("Us.Er+tag@Gmail.com")
+# -> "user@gmail.com"
+```
+
+This is useful to **key per-inbox data**, e.g. rate limits: without it, every dot/subaddress variant of the same inbox would count apart.
+
 ### Extending the providers list for typo check
 You can extend the list of common email providers used by `validate_email_provider_typo` by adding your own list in Django settings:
 ```python

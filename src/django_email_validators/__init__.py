@@ -7,6 +7,7 @@ from django_email_validators.users import (
     get_user_object_by_email,
     get_user_queryset_by_email,
 )
+from django_email_validators.utils import canonicalize_email
 from django_email_validators.validators import (
     email_is_disposable,
     validate_email_mx,
@@ -18,6 +19,7 @@ from django_email_validators.validators import (
 )
 
 __all__ = [
+    "canonicalize_email",
     "email_is_disposable",
     "get_mx_hosts",
     "get_object_by_email",

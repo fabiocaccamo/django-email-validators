@@ -9,6 +9,7 @@ class TestPackageImports:
     def test_package_imports(self):
         """Test that all public functions and classes can be imported."""
         from django_email_validators import (
+            canonicalize_email,
             email_is_disposable,
             get_mx_hosts,
             get_object_by_email,
@@ -23,6 +24,7 @@ class TestPackageImports:
             validate_email_unique_subaddress_insensitive,
         )
 
+        assert canonicalize_email is not None
         assert email_is_disposable is not None
         assert get_mx_hosts is not None
         assert get_object_by_email is not None
