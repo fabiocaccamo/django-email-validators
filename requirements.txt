@@ -1,5 +1,5 @@
 django >= 4.2
 disposable-email-domains == 0.0.*
-dnspython == 2.8.*
+dnspython >= 2.8,< 2.10
 mailchecker == 6.0.*
 pyIsEmail == 2.0.*
