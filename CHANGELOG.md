@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0](https://github.com/fabiocaccamo/django-email-validators/releases/tag/0.8.0) - 2026-10-15
+-   Add `canonicalize_email` helper: the canonical form of an email address, using the same matching rules as `validate_email_unique` (e.g. `Us.Er+tag@Gmail.com` -> `user@gmail.com`), useful to key per-inbox data such as rate limits.
+-   Refactor the lookups match pattern to use `canonicalize_email`.
+-   Add `Django 6.1` support.
+-   Drop `Python 3.10` support.
+-   Add `requires-python` to `pyproject.toml`.
+-   Bump requirements, test requirements, `pre-commit` hooks and GitHub Actions.
+
 ## [0.7.0](https://github.com/fabiocaccamo/django-email-validators/releases/tag/0.7.0) - 2026-08-04
 -   Add opt-in `check_mx` argument to `email_is_disposable` and `validate_email_non_disposable`: also check the domain MX hostnames (and their domain suffixes) against the disposable providers blocklists, catching fresh facade domains not yet blocklisted (e.g. `kjkpc.net` -> MX `prd-smtp.10minutemail.com` -> `10minutemail.com`).
 -   Add `get_mx_hosts` helper with in-process per-domain cache, so multiple validators checking the same domain cost a single DNS lookup.
