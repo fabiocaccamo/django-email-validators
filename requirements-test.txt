@@ -1,6 +1,6 @@
-coverage == 7.16.*
+coverage == 7.17.*
 pre-commit == 4.7.*
-pytest == 9.1.*
+pytest == 9.2.*
 pytest-cov == 7.1.*
 pytest-django == 4.14.*
-tox == 4.65.*
+tox == 4.67.*
